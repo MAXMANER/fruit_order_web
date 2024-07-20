@@ -16,6 +16,7 @@ Flask-Bootstrap==3.3.7.1
 Flask-Cors==4.0.1
 frozenlist==1.4.1
 future==1.0.0
+gunicorn==22.0.0
 idna==3.7
 importlib_metadata==7.1.0
 itsdangerous==2.2.0
@@ -24,6 +25,7 @@ line-bot-sdk==3.11.0
 MarkupSafe==2.1.5
 multidict==6.0.5
 mysql-connector-python==9.0.0
+packaging==24.1
 pydantic==2.7.2
 pydantic_core==2.18.3
 python-dateutil==2.9.0.post0
