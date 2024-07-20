@@ -3,6 +3,7 @@ from linebot import LineBotApi
 from linebot.exceptions import LineBotApiError
 app = Flask(__name__)
 
+access_token = 'jbpfRdbeAfDT3y1qz/1rJwPL64uq4DyMQPU6jYMkWXP8fWs/r70U594KVq53n7/urPvZXEywJTVhRIjnz2Cr14VwT5Y7uiX5+mENfVOYALF7u7JzMmcTGTotzklae3Lz000XXwSrR3eNQvv7mSiCCAdB04t89/1O/w1cDnyilFU='
 @app.route("/")
 def index():
   try:
@@ -47,7 +48,7 @@ def home():
             user_id = request.args.get('user_id')   
             #user_name = request.args.get('user_name') 
             if user_id != None:
-                line_bot_api = LineBotApi('VHR1ncoqHEos96MftVkgoidjhC7Aeiwo/c5NsxrAmrICpHNgP+nKte9tpimRlz4+Vsnuo1vn/fbjFkqh47KKJlbBmjAKN0x2RTvCgvu5L0LmunPJhpUa18g5oeuzznPLR+pYclbg8cPuq7WTNCbuYwdB04t89/1O/w1cDnyilFU=')
+                line_bot_api = LineBotApi(access_token)
                 profile = line_bot_api.get_profile(user_id)        
             #if user_id != None:
                 return render_template('index.html',user_id = user_id ,user_name = profile.display_name)
