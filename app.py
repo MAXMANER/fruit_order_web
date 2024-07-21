@@ -3,7 +3,9 @@ from linebot import LineBotApi
 from linebot.exceptions import LineBotApiError
 app = Flask(__name__)
 
-access_token = 'jbpfRdbeAfDT3y1qz/1rJwPL64uq4DyMQPU6jYMkWXP8fWs/r70U594KVq53n7/urPvZXEywJTVhRIjnz2Cr14VwT5Y7uiX5+mENfVOYALF7u7JzMmcTGTotzklae3Lz000XXwSrR3eNQvv7mSiCCAdB04t89/1O/w1cDnyilFU='
+#access_token = 'jbpfRdbeAfDT3y1qz/1rJwPL64uq4DyMQPU6jYMkWXP8fWs/r70U594KVq53n7/urPvZXEywJTVhRIjnz2Cr14VwT5Y7uiX5+mENfVOYALF7u7JzMmcTGTotzklae3Lz000XXwSrR3eNQvv7mSiCCAdB04t89/1O/w1cDnyilFU='
+access_token = os.getenv('CHANNEL_ACCESS_TOKEN')
+save_data_url = os.getenv('SAVE_DATA_URL')
 @app.route("/")
 def index():
   try:
@@ -51,7 +53,7 @@ def home():
                 line_bot_api = LineBotApi(access_token)
                 profile = line_bot_api.get_profile(user_id)        
             #if user_id != None:
-                return render_template('index.html',user_id = user_id ,user_name = profile.display_name)
+                return render_template('index.html',user_id = user_id ,user_name = profile.display_name,save_data_url = save_data_url)
             else:
                 return '請聯絡管理員,q2'
     except Exception as e:
