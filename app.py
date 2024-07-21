@@ -1,4 +1,5 @@
 from flask import Flask, render_template, request, redirect, url_for
+import os
 from linebot import LineBotApi
 from linebot.exceptions import LineBotApiError
 app = Flask(__name__)
