@@ -356,7 +356,8 @@ $('.input-number').change(function() {
                 // Send an AJAX request to the server-side script
                 $.ajax({
                     type: 'POST',
-                    url: 'https://fc57-2001-b011-800b-10fc-fccd-eb99-80b-947c.ngrok-free.app/save_data', // Change to your server-side script
+                    //url: 'https://fc57-2001-b011-800b-10fc-fccd-eb99-80b-947c.ngrok-free.app/save_data', // Change to your server-side script
+                    url: '{{save_data_url}}/save_data', // 
                     data: data,
                     success: function(response) {
                         alert('訂單已成立');
