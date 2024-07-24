@@ -4,7 +4,6 @@ from linebot import LineBotApi
 from linebot.exceptions import LineBotApiError
 app = Flask(__name__)
 
-#access_token = 'jbpfRdbeAfDT3y1qz/1rJwPL64uq4DyMQPU6jYMkWXP8fWs/r70U594KVq53n7/urPvZXEywJTVhRIjnz2Cr14VwT5Y7uiX5+mENfVOYALF7u7JzMmcTGTotzklae3Lz000XXwSrR3eNQvv7mSiCCAdB04t89/1O/w1cDnyilFU='
 access_token = os.getenv('CHANNEL_ACCESS_TOKEN')
 save_data_url = os.getenv('SAVE_DATA_URL')
 @app.route("/")
@@ -34,9 +33,16 @@ def test():
         print(e)
         return '請聯絡管理員,q1'
 
-@app.route('/text')
-def text():
-    return '<html><body><h1>我們已收到您的訂單，感謝您的訂購</h1></html>'
+@app.route('/qrcode_page')
+def qrcode_page():
+    user_id = request.args.get('user_id')   
+    #user_name = request.args.get('user_name') 
+    if user_id != None:
+        line_bot_api = LineBotApi(access_token)
+        profile = line_bot_api.get_profile(user_id)        
+        return render_template('qrcode_page.html',user_id = user_id ,user_name = profile.display_name)
+    else:
+        return '請聯絡管理員,q2'
 
 
 @app.route('/home', methods=['GET', 'POST'])
@@ -54,7 +60,7 @@ def home():
                 line_bot_api = LineBotApi(access_token)
                 profile = line_bot_api.get_profile(user_id)        
             #if user_id != None:
-                return render_template('index.html',user_id = user_id ,user_name = profile.display_name,save_data_url = save_data_url)
+                return render_template('order_page.html',user_id = user_id ,user_name = profile.display_name,save_data_url = save_data_url)
             else:
                 return '請聯絡管理員,q2'
     except Exception as e:
