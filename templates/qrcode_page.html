@@ -3,36 +3,38 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Logo with Button</title>
+    <title>老朱柚園感謝您的訂購</title>
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body, html {
-            height: 100%;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
         }
-        a {
-            font-weight: normal;
-            color: #228B22;
-        }
         .button-container {
             margin-top: 20px;
+        }
+        .spacer {
+            height: 20px; /* Adjust this value to increase or decrease the space */
         }
     </style>
 </head>
 <body>
         <form id="form" action="{{url_for('home')}}" method="get">
-                <h1>Hi, {{user_name}} 感謝您的訂購</h1>
+            <div class="spacer"></div>
+            <div class="col-md-4 col-lg-8">
+                <h2>感謝您的訂購</h2>
                 <h4>請轉帳到以下帳戶</h4><br><h2 style="color:red">華南商銀麻豆分行621200092131</h2><br><h4>並在line回覆轉帳截圖或交易末五碼<br>文旦將會在8/20起，依照訂購順序寄出</h4>
                 <div class="container text-center">
-                <img class="d-block mx-auto mb-4" src="../static/img/bank_qrcode.jpg" alt="" width="400" height="400">
+                <img class="d-block mx-auto mb-4" src="../static/img/bank_qrcode.jpg" alt="" width="200" height="200">
                 <div class="button-container">
                     <button type="submit"class="btn btn-primary">再新增一筆</button>
                 </div>
                 </div>
                 <input type="hidden" id="user_id" name="user_id" value="{{user_id}}" />
+            </div>
+            <div class="spacer"></div>
         </form>
         <script type = "text/javascript" 
          src = "{{ url_for('static', filename = 'script.js') }}" ></script>

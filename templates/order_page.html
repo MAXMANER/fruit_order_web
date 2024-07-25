@@ -94,7 +94,9 @@
       .bd-mode-toggle .dropdown-menu .active .bi {
         display: block !important;
       }
-      
+      .spacer {
+            height: 50px; /* Adjust this value to increase or decrease the space */
+      }
     </style>
 
     
@@ -111,8 +113,6 @@
       <h2>訂購單</h2>
     </div>
  
-    <div class="row g-5">
-      </div>
       <div class="col-md-7 col-lg-8">
         <h4 class="mb-3" style="color:red">line首購年打95折</h4>
         <form id="dataForm" class="needs-validation" action="{{url_for('qrcode_page')}}" method="get">
@@ -224,7 +224,7 @@
               <p class="lead">若是送禮需求請留下您的大名、電話，方便收禮人確認.</p>
               <div class="col-sm-6">
                 <label for="senderName" class="form-label">姓名</label>
-                <input type="text" class="form-control" id="senderName" name="sender_name" placeholder="" value="" >
+                <input type="text" class="form-control" id="senderName" name="sender_name" placeholder="" value="{{sender_name}}" >
                 <div class="invalid-feedback">
                   請填寫送禮人姓名(選填)
                 </div>
@@ -232,7 +232,7 @@
 
               <div class="col-sm-7">
                 <label for="senderPhone" class="form-label">聯絡電話</label>
-                <input type="text" class="form-control" id="senderPhone" name="sender_phone" placeholder="" value="" >
+                <input type="text" class="form-control" id="senderPhone" name="sender_phone" placeholder="" value="{{sender_phone}}" >
                 <div class="invalid-feedback">
                   請填寫送禮人電話(選填)
                 </div>
@@ -242,6 +242,7 @@
             </form>
           </div>
         </div>
+        <div class="spacer"></div>
       </main>
 
       <script src="{{url_for('static',filename='assets/dist/js/bootstrap.bundle.min.js')}}"></script>
