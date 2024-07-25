@@ -1,4 +1,5 @@
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, jsonify
+import requests
 import os
 from linebot import LineBotApi
 from linebot.exceptions import LineBotApiError
@@ -58,9 +59,10 @@ def home():
             #user_name = request.args.get('user_name') 
             if user_id != None:
                 line_bot_api = LineBotApi(access_token)
-                profile = line_bot_api.get_profile(user_id)        
+                profile = line_bot_api.get_profile(user_id)   
+                sender = fetch_sender(user_id)
             #if user_id != None:
-                return render_template('order_page.html',user_id = user_id ,user_name = profile.display_name,save_data_url = save_data_url)
+                return render_template('order_page.html',user_id = user_id ,user_name = profile.display_name,save_data_url = save_data_url,sender_name = sender['sender_name'], sender_phone = sender['sender_phone'])
             else:
                 return '請聯絡管理員,q2'
     except Exception as e:
@@ -101,6 +103,22 @@ def pageData():
 def staticPage():
     return render_template('static.html')
 
+
+def fetch_sender(user_id):
+    try:
+        # Make the GET request to the server API with parameters
+        response = requests.get(f'{save_data_url}/get_sender?purchaser_id={user_id}')
+        # Raise an exception if the request was unsuccessful
+        response.raise_for_status()
+        
+        # Parse the JSON response
+        data = response.json()
+        print(data)
+        return data
+        # Return the data as a JSON response
+    except requests.exceptions.RequestException as e:
+        print({'error': str(e)})
+        return 'error'
 
 if __name__ == '__main__':
     app.run(debug=True)
