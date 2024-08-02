@@ -18,6 +18,23 @@
 <link href="{{url_for('static',filename='assets/dist/css/bootstrap.min.css')}}" rel="stylesheet">
 
     <style>
+        .template-group {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+
+        .template-group:nth-child(odd) {
+            background-color: #e9f7fd; /* Light blue for odd groups */
+        }
+
+        .template-group:nth-child(even) {
+            background-color: #f4e9fd; /* Light purple for even groups */
+        }
       .bd-placeholder-img {
         font-size: 1.125rem;
         text-anchor: middle;
@@ -116,25 +133,20 @@
       <div class="col-md-7 col-lg-8">
         <h4 class="mb-3" style="color:red">line首購年打95折</h4>
         <form id="dataForm" class="needs-validation" action="{{url_for('qrcode_page')}}" method="get">
-          <div class="row g-3">
+          <div id="input-container">
+          <div class="row g-3 template-group" id="template-group">
             <table class="shop_table" cellspacing="0">    
               <tbody><tr class="product-item ">
-      
                   <td class="product-name">特級文旦柚(十斤/13~16入)</td>
-      
                   <td class="product-price">
                       <span itemprop="price" class="price"><span class="woocommerce-Price-amount amount"><span class="woocommerce-Price-currencySymbol">NT$</span>760</span> <ins><del><span class="woocommerce-Price-amount amount"><span class="woocommerce-Price-currencySymbol">NT$</span>800</span></del></ins></span>
                   </td>
       
                   <td class="product-quantity">
                   <div class="input-group">
-                <span class="input-group-btn">
-                    <button type="button" class="btn btn-danger btn-number"  data-type="minus" data-field="item1_quantity">-</button>
-                </span>
+                    <button type="button" class="btn btn-danger btn-number decrement-button"  data-type="minus" data-field="item1_quantity">-</button>
                 <input type="text" id="item1_quantity" name="item1_quantity" class="form-control input-number" value="0" min="0" max="1000">
-                <span class="input-group-btn">
-                    <button type="button" class="btn btn-success btn-number" data-type="plus" data-field="item1_quantity">+</button>
-                </span>
+                    <button type="button" class="btn btn-success btn-number increment-button" data-type="plus" data-field="item1_quantity">+</button>
             </div>
                   </td>
               </tr>
@@ -149,19 +161,65 @@
                   </td>
       
                   <td class="product-quantity">
-                       <div class="input-group">
-                <span class="input-group-btn">
-                    <button type="button" class="btn btn-danger btn-number"  data-type="minus" data-field="item2_quantity">-</button>
-                </span>
+                 <div class="input-group">
+                  <button type="button" class="btn btn-danger btn-number decrement-button"  data-type="minus" data-field="item2_quantity">-</button>
                 <input type="text" id="item2_quantity"name="item2_quantity" class="form-control input-number" value="0" min="0" max="1000">
-                <span class="input-group-btn">
-                    <button type="button" class="btn btn-success btn-number" data-type="plus" data-field="item2_quantity">+</button>
-                </span>
-            </div>
+                  <button type="button" class="btn btn-success btn-number increment-button" data-type="plus" data-field="item2_quantity">+</button>
+                </div>
                   </td>
               </tr>
           </tbody></table>
-        <div class="col-md-5 col-lg-4 order-md-last">
+            <div class="col-md-5 col-lg-4">
+              <h2>收件人</h2>
+                <div class="col-sm-6">
+                  <label for="receiverName" class="form-label">姓名</label>
+                  <input type="text" class="form-control input-receiver" id="receiverName" name ="recipient_name" placeholder="" value="{{user_name}}" required>
+                  <div class="invalid-feedback">
+                    請填寫收件人姓名.
+                  </div>
+                </div>
+
+                <div class="col-sm-7">
+                  <label for="receiverPhone" class="form-label">聯絡電話</label>
+                  <input type="text" class="form-control input-receiver" id="receiverPhone" name="recipient_phone" placeholder="" required>
+                  <div class="invalid-feedback">
+                    請填寫收件人姓名.
+                  </div>
+                </div>
+
+                <div class="col-12">
+                  <label for="receiveraddress" class="form-label">地址</label>
+                  <input type="text" class="form-control input-receiver" id="receiveraddress" name="recipient_address" placeholder="" required>
+                  <div class="invalid-feedback">
+                    請輸入收件人地址.
+                  </div>
+                </div>
+            
+              <hr class="my-4">
+
+              <h2>送禮人</h2>
+              <p class="lead">若是送禮需求請留下您的大名、電話，方便收禮人確認.</p>
+              <div class="col-sm-6">
+                <label for="senderName" class="form-label">姓名</label>
+                <input type="text" class="form-control input-sender" id="senderName" name="sender_name" placeholder="" value="{{sender_name}}" >
+                <div class="invalid-feedback">
+                  請填寫送禮人姓名(選填)
+                </div>
+              </div>
+
+              <div class="col-sm-7">
+                <label for="senderPhone" class="form-label">聯絡電話</label>
+                <input type="text" class="form-control input-sender" id="senderPhone" name="sender_phone" placeholder="" value="{{sender_phone}}" >
+                <div class="invalid-feedback">
+                  請填寫送禮人電話(選填)
+                </div>
+              </div>
+            </div>
+            <div class="spacer"></div>
+          </div>
+        </div>
+            <button type="button" class="btn btn-primary" id="add-group-button">再新增一筆</button>
+
             <h4 class="d-flex justify-content-between align-items-center mb-3">
               <span class="text-primary">購物車</span>
               <span id="total-quantity"class="badge bg-primary rounded-pill">0</span>
@@ -170,14 +228,14 @@
               <li class="list-group-item d-flex justify-content-between lh-sm">
                 <div>
                   <h6 class="my-0">特級文旦</h6>
-                  <small class="text-body-secondary">Brief description</small>
+                  <small class="text-body-secondary" id="item1-quantity">*0</small>
                 </div>
                 <span>$<span class="text-body-secondary" id="item1-price">0</span></span>
               </li>
               <li class="list-group-item d-flex justify-content-between lh-sm">
                 <div>
                   <h6 class="my-0">優級文旦</h6>
-                  <small class="text-body-secondary">Brief description</small>
+                  <small class="text-body-secondary" id="item2-quantity">*0</small>
                 </div>
                 <span>$<span class="text-body-secondary" id="item2-price">0</span></span>
               </li>
@@ -193,50 +251,7 @@
                 <span>$<strong id="total_price" name="total_price">0</strong></span>
               </li>
             </ul>
-            <h2>收件人</h2>
-                <div class="col-sm-6">
-                  <label for="receiverName" class="form-label">姓名</label>
-                  <input type="text" class="form-control" id="receiverName" name ="recipient_name" placeholder="" value="{{user_name}}" required>
-                  <div class="invalid-feedback">
-                    請填寫收件人姓名.
-                  </div>
-                </div>
 
-                <div class="col-sm-7">
-                  <label for="receiverPhone" class="form-label">聯絡電話</label>
-                  <input type="text" class="form-control" id="receiverPhone" name="recipient_phone" placeholder="" required>
-                  <div class="invalid-feedback">
-                    請填寫收件人姓名.
-                  </div>
-                </div>
-
-                <div class="col-12">
-                  <label for="receiveraddress" class="form-label">地址</label>
-                  <input type="text" class="form-control" id="receiveraddress" name="recipient_address" placeholder="" required>
-                  <div class="invalid-feedback">
-                    請輸入收件人地址.
-                  </div>
-                </div>
-            
-              <hr class="my-4">
-
-              <h2>送禮人</h2>
-              <p class="lead">若是送禮需求請留下您的大名、電話，方便收禮人確認.</p>
-              <div class="col-sm-6">
-                <label for="senderName" class="form-label">姓名</label>
-                <input type="text" class="form-control" id="senderName" name="sender_name" placeholder="" value="{{sender_name}}" >
-                <div class="invalid-feedback">
-                  請填寫送禮人姓名(選填)
-                </div>
-              </div>
-
-              <div class="col-sm-7">
-                <label for="senderPhone" class="form-label">聯絡電話</label>
-                <input type="text" class="form-control" id="senderPhone" name="sender_phone" placeholder="" value="{{sender_phone}}" >
-                <div class="invalid-feedback">
-                  請填寫送禮人電話(選填)
-                </div>
-              </div>
               <input type="hidden" id="user_id" name="user_id" value="{{user_id}}" />
               <button class="w-100 btn btn-primary btn-lg" type="submit" value="Submit">送出訂單</button>
             </form>
@@ -248,85 +263,98 @@
       <script src="{{url_for('static',filename='assets/dist/js/bootstrap.bundle.min.js')}}"></script>
 
 <script>
-  $(document).ready(function() {
 
-        function updateTotal() {
-            var item1_quantity = parseFloat($('#item1_quantity').val());
-            var item2_quantity = parseFloat($('#item2_quantity').val());
+$(document).ready(function() {
 
-            if (!isNaN(item1_quantity) && !isNaN(item2_quantity)) {
+   function updateTotal() {
+        let total = 0;
+        let item1_quantity = 0;
+        let item2_quantity = 0;
+        let discount=0;
+        $('.template-group').each(function() {
+            $(this).find('.input-group').each(function(index) {
+                let input = $(this).find('.input-number');
+                let value = parseInt(input.val()) || 0;
+                console.log('index:'+index+'value:'+value);
+                if (index === 0) {
+                    item1_quantity += value; // First set multiplier
+                } else if (index === 1) {
+                    item2_quantity += value; // Second set multiplier
+                }
+                console.log('total:'+total);
+                discount = (item1_quantity * 40) + (item2_quantity * 30);
+                total_price = (item1_quantity * 800)+(item2_quantity * 600) - discount
+                $('#total-quantity').text(item1_quantity + item2_quantity);
                 $('#item1-price').text(item1_quantity * 800);
+                $('#item1-quantity').text(item1_quantity+"箱");
                 $('#item2-price').text(item2_quantity * 600);
-                var total_quantity = item1_quantity + item2_quantity;
-                var total_price = (item1_quantity * 760) + (item2_quantity * 570);
-                $('#total-quantity').text(total_quantity);
-                $('#total_price').text(total_price);
-                var discount = (item1_quantity * 40) + (item2_quantity * 30);
+                $('#item2-quantity').text(item2_quantity+"箱");
                 $('#discount').text(discount);
-            } else {
-                $('#total_price').text('Invalid input');
-            }
+                $('#total_price').text(total_price);
+            });
+        });
+        $('#total-sum').text(total);
         }
 
-        $('#item1_quantity, #item2_quantity').on('input', updateTotal);
-
-    $('.btn-number').click(function(e){
-    e.preventDefault();
-    
-    fieldName = $(this).attr('data-field');
-    type      = $(this).attr('data-type');
-    var input = $("input[name='"+fieldName+"']");
-    var currentVal = parseInt(input.val());
-    if (!isNaN(currentVal)) {
-        if(type == 'minus') {
-            
-            if(currentVal > input.attr('min')) {
-                input.val(currentVal - 1).change();
-            } 
-            if(parseInt(input.val()) == input.attr('min')) {
-                $(this).attr('disabled', true);
-            }
-
-        } else if(type == 'plus') {
-
-            if(currentVal < input.attr('max')) {
-                input.val(currentVal + 1).change();
-            }
-            if(parseInt(input.val()) == input.attr('max')) {
-                $(this).attr('disabled', true);
-            }
-
-        }
-    } else {
-        input.val(0);
+  function updateValue(input, isIncrement) {
+      let currentValue = parseInt(input.val());
+      let newValue = isIncrement ? currentValue + 1 : currentValue - 1;
+      if (newValue >= 0 && newValue <= 1000) {
+          input.val(newValue);
+          updateTotal();
+      }
     }
-    updateTotal();
+  function validateGroupQuantities() {
+          let valid = true;
+          $('.template-group').each(function() {
+              let item1Qty = parseInt($(this).find("input[name='item1_quantity']").val()) || 0;
+              let item2Qty = parseInt($(this).find("input[name='item2_quantity']").val()) || 0;
+
+              if (item1Qty + item2Qty <= 0) {
+                  valid = false;
+                  $(this).css("border", "2px solid red"); // Highlight invalid group
+                  alert("請確認每組的訂購數量總和大於0。");
+              } else {
+                  $(this).css("border", "1px solid #ccc"); // Reset border for valid groups
+              }
+          });
+          return valid;
+      }
+// Event handler for decrement buttons
+$(document).on('click', '.decrement-button', function() {
+    let input = $(this).siblings('.input-number');
+    updateValue(input, false);
 });
+
+// Event handler for increment buttons
+$(document).on('click', '.increment-button', function() {
+    let input = $(this).siblings('.input-number');
+    updateValue(input, true);
+});
+
 $('.input-number').focusin(function(){
    $(this).data('oldValue', $(this).val());
 });
-$('.input-number').change(function() {
-    
+$(document).on('change', '.input-number', function() {
     minValue =  parseInt($(this).attr('min'));
     maxValue =  parseInt($(this).attr('max'));
     valueCurrent = parseInt($(this).val());
-    
     name = $(this).attr('name');
     if(valueCurrent >= minValue) {
         $(".btn-number[data-type='minus'][data-field='"+name+"']").removeAttr('disabled')
     } else {
-        alert('Sorry, the minimum value was reached');
+        alert('請填0~1000之間的數字');
         $(this).val($(this).data('oldValue'));
     }
     if(valueCurrent <= maxValue) {
         $(".btn-number[data-type='plus'][data-field='"+name+"']").removeAttr('disabled')
     } else {
-        alert('Sorry, the maximum value was reached');
+        alert('請填0~1000之間的數字');
         $(this).val($(this).data('oldValue'));
     }
-    
-    
+    updateTotal();
 });
+
     $(".input-number").keydown(function (e) {
         // Allow: backspace, delete, tab, escape, enter and .
         if ($.inArray(e.keyCode, [46, 8, 9, 27, 13, 190]) !== -1 ||
@@ -342,35 +370,58 @@ $('.input-number').change(function() {
             e.preventDefault();
         }
     });
-    
-            $('#dataForm').on('submit', function(event) {
-                event.preventDefault(); // Prevent the default form submission
-
-                // Serialize the form data
-                var formData = $(this).serialize();
-                var total_price = $('#total_price').text();
-                if(parseInt(total_price)>0){
-                var data = $(this).serialize() + "&purchaser_id={{user_id}}&purchaser_name={{user_name}}&total_price="+total_price
-                
-                // Send an AJAX request to the server-side script
-                $.ajax({
-                    type: 'POST',
-                    //url: 'https://fc57-2001-b011-800b-10fc-fccd-eb99-80b-947c.ngrok-free.app/save_data', // Change to your server-side script
-                    url: '{{save_data_url}}/save_data', // 
-                    data: data,
-                    success: function(response) {
-                        alert('訂單已成立');
-                        event.target.submit();
-                    },
-                    error: function(jqXHR, textStatus, errorThrown) {
-                        alert('訂單成立失敗，請聯絡我們');
-                    }
-                });
-              }
-              else{
-                alert('訂購數量不可為0');
-              }
+    $('#add-group-button').click(function() {
+                let originalGroup = $('#template-group').last();
+                let newGroup = originalGroup.clone();
+                newGroup.find('.input-number').val(0); // Reset input values to 0
+                newGroup.find('.input-receiver').val('');
+                newGroup.appendTo('#input-container');
             });
+
+    
+    $('#dataForm').on('submit', function(event) {
+                event.preventDefault(); // Prevent the default form submission
+                if (!validateGroupQuantities()) {
+                            return;
+                        }
+                // Serialize the form data
+                 let groups = [];
+                $('.template-group').each(function(index) {
+                  let group = {
+                    groupId: index + 1,
+                    item1_quantity: parseInt($(this).find("input[name='item1_quantity']").val()) || 0,
+                    item2_quantity: parseInt($(this).find("input[name='item2_quantity']").val()) || 0,
+                    recipient_name: $(this).find("input[name='recipient_name']").val(),
+                    recipient_phone: $(this).find("input[name='recipient_phone']").val(),
+                    recipient_address: $(this).find("input[name='recipient_address']").val(),
+                    sender_name: $(this).find("input[name='sender_name']").val(),
+                    sender_phone: $(this).find("input[name='sender_phone']").val(),
+                    total_price: (parseInt($(this).find("input[name='item1_quantity']").val()) || 0)*760+(parseInt($(this).find("input[name='item2_quantity']").val()) || 0)*570
+                  };
+                  groups.push(group);
+                });
+                let data = {
+                  user_id: '{{user_id}}',
+                  user_name: '{{user_name}}',
+                  groups: groups
+                };
+              console.log(JSON.stringify(data));
+              // Send an AJAX request to the server-side script
+              
+              $.ajax({
+                  type: 'POST',
+                  url: '{{save_data_url}}/save_data',
+                  contentType: 'application/json',
+                  data: JSON.stringify(data),
+                  success: function(response) {
+                      alert('訂單已成立');
+                      event.target.submit();
+                  },
+                  error: function(jqXHR, textStatus, errorThrown) {
+                      alert('訂單成立失敗，請聯絡我們');
+                  }
+              });           
+          });
             
         });
 
