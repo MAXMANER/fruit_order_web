@@ -5,8 +5,10 @@ from linebot import LineBotApi
 from linebot.exceptions import LineBotApiError
 app = Flask(__name__)
 
-access_token = os.getenv('CHANNEL_ACCESS_TOKEN')
-save_data_url = os.getenv('SAVE_DATA_URL')
+access_token = 'jbpfRdbeAfDT3y1qz/1rJwPL64uq4DyMQPU6jYMkWXP8fWs/r70U594KVq53n7/urPvZXEywJTVhRIjnz2Cr14VwT5Y7uiX5+mENfVOYALF7u7JzMmcTGTotzklae3Lz000XXwSrR3eNQvv7mSiCCAdB04t89/1O/w1cDnyilFU='
+save_data_url = 'https://bac6-1-168-89-21.ngrok-free.app'
+#access_token = os.getenv('CHANNEL_ACCESS_TOKEN')
+#save_data_url = os.getenv('SAVE_DATA_URL')
 @app.route("/")
 def index():
   try:
@@ -32,7 +34,7 @@ def test():
             return '請聯絡管理員,q2'
     except Exception as e:
         print(e)
-        return '請聯絡管理員,q1'
+        return f'請聯絡管理員,q1'
 
 @app.route('/qrcode_page')
 def qrcode_page():
@@ -61,8 +63,10 @@ def home():
                 line_bot_api = LineBotApi(access_token)
                 profile = line_bot_api.get_profile(user_id)   
                 sender = fetch_sender(user_id)
-            #if user_id != None:
-                return render_template('order_page.html',user_id = user_id ,user_name = profile.display_name,save_data_url = save_data_url,sender_name = sender['sender_name'], sender_phone = sender['sender_phone'])
+                #if user_id != None:
+                sender_name = sender['sender_name'] if  sender['sender_name'] else ""
+                sender_phone = sender['sender_phone'] if  sender['sender_phone'] else ""
+                return render_template('order_page.html',user_id = user_id ,user_name = profile.display_name,save_data_url = save_data_url,sender_name = sender_name, sender_phone = sender_phone)
             else:
                 return '請聯絡管理員,q2'
     except Exception as e:
