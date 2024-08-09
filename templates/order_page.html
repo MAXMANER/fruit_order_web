@@ -126,7 +126,7 @@
 <div class="container">
   <main>
     <div class="py-5 text-center">
-      <img class="d-block mx-auto mb-4" src="../static/img/logo.png" alt="" width="144" height="114">
+      <img class="d-block mx-auto mb-4" src="../static/img/logo.png" alt="" width="100" height="114">
       <h2>訂購單</h2>
     </div>
  
@@ -145,8 +145,9 @@
                   <td class="product-quantity">
                   <div class="input-group">
                     <button type="button" class="btn btn-danger btn-number decrement-button"  data-type="minus" data-field="item1_quantity">-</button>
-                <input type="text" id="item1_quantity" name="item1_quantity" class="form-control input-number" value="0" min="0" max="1000">
+                <input type="number" id="item1_quantity" name="item1_quantity" class="form-control input-number input-item1" value="0" min="0" max="{{item1_max_quantity}}">
                     <button type="button" class="btn btn-success btn-number increment-button" data-type="plus" data-field="item1_quantity">+</button>
+                    <span id="remaining_quantity1" class="remaining-quantity1">剩餘 {{item1_max_quantity}}</span>
             </div>
                   </td>
               </tr>
@@ -163,8 +164,9 @@
                   <td class="product-quantity">
                  <div class="input-group">
                   <button type="button" class="btn btn-danger btn-number decrement-button"  data-type="minus" data-field="item2_quantity">-</button>
-                <input type="text" id="item2_quantity"name="item2_quantity" class="form-control input-number" value="0" min="0" max="1000">
+                <input type="number" id="item2_quantity"name="item2_quantity" class="form-control input-number input-item2" value="0" min="0" max="{{item2_max_quantity}}">
                   <button type="button" class="btn btn-success btn-number increment-button" data-type="plus" data-field="item2_quantity">+</button>
+                  <span id="remaining_quantity2" class="remaining-quantity2" >剩餘 {{item2_max_quantity}}</span>
                 </div>
                   </td>
               </tr>
@@ -265,44 +267,79 @@
 <script>
 
 $(document).ready(function() {
+    $('.input-number').on('change keyup', function() {
+      let sum = 0;
+      console.log("change");
+      if($(this).attr('id') =='item1_quantity'){
+            $('input.input-item1').each(function() {
+            let value = parseFloat($(this).val());
+            if (!isNaN(value)) {
+                sum += value;
+            }
+          });
+      }
+      else if($(this).attr('id') =='item2_quantity'){
+            $('input.input-item2').each(function() {
+            let value = parseFloat($(this).val());
+            if (!isNaN(value)) {
+                sum += value;
+            }
+          });
+      }
+        console.log('Total sum: ' + sum);
+        let min = parseInt($(this).attr('min'));
+        let max = parseInt($(this).attr('max'));
+        let value = parseInt($(this).val());
+        if (value < min) {
+            $(this).val(min);
+        } else if (sum > max) {
+            $(this).val(0);
+        }
 
+        updateTotal();
+    });
    function updateTotal() {
+        console.log("updateTotal");
         let total = 0;
         let item1_quantity = 0;
         let item2_quantity = 0;
         let discount=0;
+        let maxQuantities = {
+            item1: {{ item1_max_quantity }},
+            item2: {{ item2_max_quantity }}
+        };
         $('.template-group').each(function() {
             $(this).find('.input-group').each(function(index) {
                 let input = $(this).find('.input-number');
                 let value = parseInt(input.val()) || 0;
-                console.log('index:'+index+'value:'+value);
                 if (index === 0) {
                     item1_quantity += value; // First set multiplier
                 } else if (index === 1) {
                     item2_quantity += value; // Second set multiplier
                 }
-                console.log('total:'+total);
-                discount = (item1_quantity * 40) + (item2_quantity * 30);
-                total_price = (item1_quantity * 800)+(item2_quantity * 600) - discount
-                $('#total-quantity').text(item1_quantity + item2_quantity);
-                $('#item1-price').text(item1_quantity * 800);
-                $('#item1-quantity').text(item1_quantity+"箱");
-                $('#item2-price').text(item2_quantity * 600);
-                $('#item2-quantity').text(item2_quantity+"箱");
-                $('#discount').text(discount);
-                $('#total_price').text(total_price);
             });
         });
+        discount = (item1_quantity * 40) + (item2_quantity * 30);
+        total_price = (item1_quantity * 800)+(item2_quantity * 600) - discount
+        $('#total-quantity').text(item1_quantity + item2_quantity);
+        $('#item1-price').text(item1_quantity * 800);
+        $('#item1-quantity').text(item1_quantity+"箱");
+        $('#item2-price').text(item2_quantity * 600);
+        $('#item2-quantity').text(item2_quantity+"箱");
+        $('#discount').text(discount);
+        $('#total_price').text(total_price);
+        $('.remaining-quantity1').text(`剩餘 ${maxQuantities.item1 - item1_quantity}`);
+        $('.remaining-quantity2').text(`剩餘 ${maxQuantities.item2 - item2_quantity}`);
+        //$('.input-item1').attr('max',maxQuantities.item1 - item1_quantity);
+        //$('.input-item2').attr('max',maxQuantities.item2 - item2_quantity);
         $('#total-sum').text(total);
         }
 
   function updateValue(input, isIncrement) {
       let currentValue = parseInt(input.val());
       let newValue = isIncrement ? currentValue + 1 : currentValue - 1;
-      if (newValue >= 0 && newValue <= 1000) {
-          input.val(newValue);
-          updateTotal();
-      }
+      console.log("updateValue");
+      input.val(newValue).trigger('change');
     }
   function validateGroupQuantities() {
           let valid = true;
@@ -321,6 +358,7 @@ $(document).ready(function() {
           return valid;
       }
 // Event handler for decrement buttons
+
 $(document).on('click', '.decrement-button', function() {
     let input = $(this).siblings('.input-number');
     updateValue(input, false);
@@ -343,18 +381,20 @@ $(document).on('change', '.input-number', function() {
     if(valueCurrent >= minValue) {
         $(".btn-number[data-type='minus'][data-field='"+name+"']").removeAttr('disabled')
     } else {
-        alert('請填0~1000之間的數字');
+        //alert('請填0~1000之間的數字');
+        alert('低於'+minValue);
         $(this).val($(this).data('oldValue'));
     }
     if(valueCurrent <= maxValue) {
         $(".btn-number[data-type='plus'][data-field='"+name+"']").removeAttr('disabled')
     } else {
-        alert('請填0~1000之間的數字');
+        //alert('請填0~1000之間的數字');
+        alert('超出'+maxValue);
         $(this).val($(this).data('oldValue'));
     }
     updateTotal();
 });
-
+*/
     $(".input-number").keydown(function (e) {
         // Allow: backspace, delete, tab, escape, enter and .
         if ($.inArray(e.keyCode, [46, 8, 9, 27, 13, 190]) !== -1 ||
@@ -372,7 +412,7 @@ $(document).on('change', '.input-number', function() {
     });
     $('#add-group-button').click(function() {
                 let originalGroup = $('#template-group').last();
-                let newGroup = originalGroup.clone();
+                let newGroup = originalGroup.clone(true);
                 newGroup.find('.input-number').val(0); // Reset input values to 0
                 newGroup.find('.input-receiver').val('');
                 newGroup.appendTo('#input-container');
