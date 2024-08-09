@@ -63,10 +63,13 @@ def home():
                 line_bot_api = LineBotApi(access_token)
                 profile = line_bot_api.get_profile(user_id)   
                 sender = fetch_sender(user_id)
+                quantity = fetch_quantity()
                 #if user_id != None:
                 sender_name = sender['sender_name'] if  sender['sender_name'] else ""
                 sender_phone = sender['sender_phone'] if  sender['sender_phone'] else ""
-                return render_template('order_page.html',user_id = user_id ,user_name = profile.display_name,save_data_url = save_data_url,sender_name = sender_name, sender_phone = sender_phone)
+                item1_quantity = quantity['item1_quantity'] if  quantity['item1_quantity'] else 999
+                item2_quantity = quantity['item2_quantity'] if  quantity['item2_quantity'] else 999
+                return render_template('order_page.html',user_id = user_id ,user_name = profile.display_name,save_data_url = save_data_url,sender_name = sender_name, sender_phone = sender_phone, item1_max_quantity = item1_quantity,item2_max_quantity = item2_quantity)
             else:
                 return '請聯絡管理員,q2'
     except Exception as e:
@@ -112,6 +115,22 @@ def fetch_sender(user_id):
     try:
         # Make the GET request to the server API with parameters
         response = requests.get(f'{save_data_url}/get_sender?purchaser_id={user_id}')
+        # Raise an exception if the request was unsuccessful
+        response.raise_for_status()
+        
+        # Parse the JSON response
+        data = response.json()
+        print(data)
+        return data
+        # Return the data as a JSON response
+    except requests.exceptions.RequestException as e:
+        print({'error': str(e)})
+        return 'error'
+
+def fetch_quantity():
+    try:
+        # Make the GET request to the server API with parameters
+        response = requests.get(f'{save_data_url}/get_quantity')
         # Raise an exception if the request was unsuccessful
         response.raise_for_status()
         
