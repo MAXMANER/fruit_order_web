@@ -5,10 +5,10 @@ from linebot import LineBotApi
 from linebot.exceptions import LineBotApiError
 app = Flask(__name__)
 
-access_token = 'jbpfRdbeAfDT3y1qz/1rJwPL64uq4DyMQPU6jYMkWXP8fWs/r70U594KVq53n7/urPvZXEywJTVhRIjnz2Cr14VwT5Y7uiX5+mENfVOYALF7u7JzMmcTGTotzklae3Lz000XXwSrR3eNQvv7mSiCCAdB04t89/1O/w1cDnyilFU='
-save_data_url = 'https://bac6-1-168-89-21.ngrok-free.app'
-#access_token = os.getenv('CHANNEL_ACCESS_TOKEN')
-#save_data_url = os.getenv('SAVE_DATA_URL')
+#access_token = 'jbpfRdbeAfDT3y1qz/1rJwPL64uq4DyMQPU6jYMkWXP8fWs/r70U594KVq53n7/urPvZXEywJTVhRIjnz2Cr14VwT5Y7uiX5+mENfVOYALF7u7JzMmcTGTotzklae3Lz000XXwSrR3eNQvv7mSiCCAdB04t89/1O/w1cDnyilFU='
+#save_data_url = 'https://bac6-1-168-89-21.ngrok-free.app'
+access_token = os.getenv('CHANNEL_ACCESS_TOKEN')
+save_data_url = os.getenv('SAVE_DATA_URL')
 @app.route("/")
 def index():
   try:
