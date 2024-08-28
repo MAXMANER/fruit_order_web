@@ -6,7 +6,7 @@ from linebot.exceptions import LineBotApiError
 app = Flask(__name__)
 
 #access_token = 'jbpfRdbeAfDT3y1qz/1rJwPL64uq4DyMQPU6jYMkWXP8fWs/r70U594KVq53n7/urPvZXEywJTVhRIjnz2Cr14VwT5Y7uiX5+mENfVOYALF7u7JzMmcTGTotzklae3Lz000XXwSrR3eNQvv7mSiCCAdB04t89/1O/w1cDnyilFU='
-#save_data_url = 'https://bac6-1-168-89-21.ngrok-free.app'
+#save_data_url = 'https://3f3d-2001-b011-800b-783a-c96a-381-5735-69db.ngrok-free.app'
 access_token = os.getenv('CHANNEL_ACCESS_TOKEN')
 save_data_url = os.getenv('SAVE_DATA_URL')
 @app.route("/")
@@ -67,8 +67,8 @@ def home():
                 #if user_id != None:
                 sender_name = sender['sender_name'] if  sender['sender_name'] else ""
                 sender_phone = sender['sender_phone'] if  sender['sender_phone'] else ""
-                item1_quantity = quantity['item1_quantity'] if  quantity['item1_quantity'] else 999
-                item2_quantity = quantity['item2_quantity'] if  quantity['item2_quantity'] else 999
+                item1_quantity = quantity['item1_quantity'] if  quantity['item1_quantity'] else 0
+                item2_quantity = quantity['item2_quantity'] if  quantity['item2_quantity'] else 0
                 return render_template('order_page.html',user_id = user_id ,user_name = profile.display_name,save_data_url = save_data_url,sender_name = sender_name, sender_phone = sender_phone, item1_max_quantity = item1_quantity,item2_max_quantity = item2_quantity)
             else:
                 return '請聯絡管理員,q2'
