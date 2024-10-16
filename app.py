@@ -6,7 +6,7 @@ from linebot.exceptions import LineBotApiError
 app = Flask(__name__)
 
 #access_token = 'jbpfRdbeAfDT3y1qz/1rJwPL64uq4DyMQPU6jYMkWXP8fWs/r70U594KVq53n7/urPvZXEywJTVhRIjnz2Cr14VwT5Y7uiX5+mENfVOYALF7u7JzMmcTGTotzklae3Lz000XXwSrR3eNQvv7mSiCCAdB04t89/1O/w1cDnyilFU='
-#save_data_url = 'https://3f3d-2001-b011-800b-783a-c96a-381-5735-69db.ngrok-free.app'
+#save_data_url = 'http://127.0.0.1:7999'
 access_token = os.getenv('CHANNEL_ACCESS_TOKEN')
 save_data_url = os.getenv('SAVE_DATA_URL')
 @app.route("/")
@@ -62,14 +62,16 @@ def home():
             if user_id != None:
                 line_bot_api = LineBotApi(access_token)
                 profile = line_bot_api.get_profile(user_id)   
-                sender = fetch_sender(user_id)
+                #sender = fetch_sender(user_id)
                 quantity = fetch_quantity()
-                #if user_id != None:
-                sender_name = sender['sender_name'] if  sender['sender_name'] else ""
-                sender_phone = sender['sender_phone'] if  sender['sender_phone'] else ""
+                purchaser_data = fetch_purchaser_data(user_id)
+                for item in purchaser_data:
+                    print(item)
+                #sender_name = sender['sender_name'] if  sender['sender_name'] else ""
+                #sender_phone = sender['sender_phone'] if  sender['sender_phone'] else ""
                 item1_quantity = quantity['item1_quantity'] if  quantity['item1_quantity'] else 0
                 item2_quantity = quantity['item2_quantity'] if  quantity['item2_quantity'] else 0
-                return render_template('order_page.html',user_id = user_id ,user_name = profile.display_name,save_data_url = save_data_url,sender_name = sender_name, sender_phone = sender_phone, item1_max_quantity = item1_quantity,item2_max_quantity = item2_quantity)
+                return render_template('order_page.html',user_id = user_id ,user_name = profile.display_name,save_data_url = save_data_url,sender_name = "", sender_phone = "", item1_max_quantity = item1_quantity,item2_max_quantity = item2_quantity, data_list = purchaser_data)
             else:
                 return '請聯絡管理員,q2'
     except Exception as e:
@@ -110,9 +112,9 @@ def pageData():
 def staticPage():
     return render_template('static.html')
 
-
+'''
 def fetch_sender(user_id):
-    try:
+    try:fetch_sender
         # Make the GET request to the server API with parameters
         response = requests.get(f'{save_data_url}/get_sender?purchaser_id={user_id}')
         # Raise an exception if the request was unsuccessful
@@ -126,6 +128,7 @@ def fetch_sender(user_id):
     except requests.exceptions.RequestException as e:
         print({'error': str(e)})
         return 'error'
+'''
 
 def fetch_quantity():
     try:
@@ -136,7 +139,23 @@ def fetch_quantity():
         
         # Parse the JSON response
         data = response.json()
-        print(data)
+        #print(data)
+        return data
+        # Return the data as a JSON response
+    except requests.exceptions.RequestException as e:
+        print({'error': str(e)})
+        return 'error'
+
+def fetch_purchaser_data(purchaser_id):
+    try:
+        # Make the GET request to the server API with parameters
+        response = requests.get(f'{save_data_url}/get_purchaser_data?purchaser_id={purchaser_id}')
+        # Raise an exception if the request was unsuccessful
+        response.raise_for_status()
+        
+        # Parse the JSON response
+        data = response.json()
+        data = data["data"]
         return data
         # Return the data as a JSON response
     except requests.exceptions.RequestException as e:
