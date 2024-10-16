@@ -114,6 +114,33 @@
       .spacer {
             height: 50px; /* Adjust this value to increase or decrease the space */
       }
+
+
+      .radio-group div {
+              display: flex;
+              align-items: center;
+              margin-bottom: 10px;
+          }
+
+          .radio-group label {
+              margin-left: 5px; /* Add some spacing between radio button and label */
+          }
+
+        /* Remove position absolute for change-btn */
+        .change-btn {
+            float: right; /* Float the button to the right within the data block */
+            margin-top: 10px;
+        }
+
+        /* Pop-up and overlay styles */
+        .popup, .overlay {
+            display: none;
+        }
+
+        .popup.active, .overlay.active {
+            display: block;
+        }
+
     </style>
 
     
@@ -131,15 +158,17 @@
     </div>
  
       <div class="col-md-7 col-lg-8">
-        <h4 class="mb-3" style="color:red">今年文旦柚已全數銷售完畢，想吃柚子的朋友，明年可以提早預購喔!</h4>
         <form id="dataForm" class="needs-validation" action="{{url_for('qrcode_page')}}" method="get">
           <div id="input-container">
           <div class="row g-3 template-group" id="template-group">
             <table class="shop_table" cellspacing="0">    
               <tbody><tr class="product-item ">
-                  <td class="product-name">特級文旦柚(十斤/13~16入)</td>
+                  <td class="product-name">白柚10斤裝(約4~5入)</td>
                   <td class="product-price">
-                      <span itemprop="price" class="price"><span class="woocommerce-Price-amount amount"><span class="woocommerce-Price-currencySymbol">NT$</span>760</span> <ins><del><span class="woocommerce-Price-amount amount"><span class="woocommerce-Price-currencySymbol">NT$</span>800</span></del></ins></span>
+                      <span itemprop="price" class="price"><span class="woocommerce-Price-amount amount"><span class="woocommerce-Price-currencySymbol">NT$</span>600</span> 
+                      <!--
+                      <ins><del><span class="woocommerce-Price-amount amount"><span class="woocommerce-Price-currencySymbol">NT$</span>800</span></del></ins></span>
+                      !-->
                   </td>
       
                   <td class="product-quantity">
@@ -155,10 +184,13 @@
               <tr class="product-item ">
       
       
-                  <td class="product-name">優級文旦柚(十斤/10~12入)</td>
+                  <td class="product-name">白柚20斤裝(約7~10入)</td>
       
                   <td class="product-price">
-                      <span itemprop="price" class="price"><span class="woocommerce-Price-amount amount"><span class="woocommerce-Price-currencySymbol">NT$</span>570</span> <ins><del><span class="woocommerce-Price-amount amount"><span class="woocommerce-Price-currencySymbol">NT$</span>600</span></del></ins></span>
+                      <span itemprop="price" class="price"><span class="woocommerce-Price-amount amount"><span class="woocommerce-Price-currencySymbol">NT$</span>1200</span> 
+                      <!--
+                      <ins><del><span class="woocommerce-Price-amount amount"><span class="woocommerce-Price-currencySymbol">NT$</span>600</span></del></ins></span>
+                      !-->
                   </td>
       
                   <td class="product-quantity">
@@ -171,57 +203,120 @@
                   </td>
               </tr>
           </tbody></table>
-            <div class="col-md-5 col-lg-4">
-              <h2>收件人</h2>
-                <div class="col-sm-6">
-                  <label for="receiverName" class="form-label">姓名</label>
-                  <input type="text" class="form-control input-receiver" id="receiverName" name ="recipient_name" placeholder="" value="{{user_name}}" required>
-                  <div class="invalid-feedback">
-                    請填寫收件人姓名.
-                  </div>
-                </div>
+    <!-- Radio buttons group with Bootstrap -->
+    <div class="radio-group">
+        <div class="form-check">
+            <input class="form-check-input" type="radio" id="purchaser_data" name="display_option" value="purchaser" onclick="toggleDisplay()">
+            <label class="form-check-label" for="purchaser_data">寄送資訊</label>
+        </div>
+        <div class="form-check">
+            <input class="form-check-input" type="radio" id="form_data" name="display_option" value="form" onclick="toggleDisplay()">
+            <label class="form-check-label" for="form_data">自行填寫</label>
+        </div>
+    </div>
 
-                <div class="col-sm-7">
-                  <label for="receiverPhone" class="form-label">聯絡電話</label>
-                  <input type="text" class="form-control input-receiver" id="receiverPhone" name="recipient_phone" placeholder="" required>
-                  <div class="invalid-feedback">
-                    請填寫收件人姓名.
-                  </div>
-                </div>
+  <div class="data-block" id="purchaserBlock">
+      <p id="recipient_name">收件人: {{ data_list[0]['recipient_name'] }}</p>
+      <p id="recipient_phone">收件電話: {{ data_list[0]['recipient_phone'] }}</p>
+      <p id="recipient_address">收件地址: {{ data_list[0]['recipient_address'] }}</p>
+      <p id="sender_name">送禮人: {{ data_list[0]['sender_name'] }}</p>
+      <p id="sender_phone">送禮人電話: {{ data_list[0]['sender_phone'] }}</p>
 
-                <div class="col-12">
-                  <label for="receiveraddress" class="form-label">地址</label>
-                  <input type="text" class="form-control input-receiver" id="receiveraddress" name="recipient_address" placeholder="" required>
-                  <div class="invalid-feedback">
+      <!-- Change button with Bootstrap styling -->
+      <button type="button" class="btn btn-primary change-btn" data-bs-toggle="modal" data-bs-target="#popupModal">
+          變更地址
+      </button>
+  </div>
+
+<!-- Bootstrap Modal for Pop-up -->
+<div class="modal fade" id="popupModal" tabindex="-1" aria-labelledby="popupModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="popupModalLabel">選擇寄送地址</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+ <div class="modal-body">
+    <div id="puchaserForm">
+        {% for item in data_list %}
+        <div class="form-check" style="background-color: {% if loop.index0 % 2 == 0 %} #f8f9fa {% else %} #e9ecef {% endif %}; padding: 10px; margin-bottom: 10px; border-radius: 5px;">
+            <input class="form-check-input" type="radio" name="data_choice" value="{{ loop.index0 }}" id="data_choice{{ loop.index0 }}">
+            <label class="form-check-label" for="data_choice{{ loop.index0 }}">
+                收件人姓名: {{ item['recipient_name'] }}<br>
+                收件電話: {{ item['recipient_phone'] }}<br>
+                收件地址: {{ item['recipient_address'] }}<br>
+                送禮人姓名: {{ item['sender_name'] }}<br>
+                送禮人電話: {{ item['sender_phone'] }}
+            </label>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary " onclick="updateDataBlock()" data-bs-dismiss="modal">確定</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                
+
+            </div>
+        </div>
+    </div>
+</div>
+
+    <!-- Second block: Form for inputting data -->
+    <div class="form-block" id="formBlock">
+        <div class="col-md-5 col-lg-4">
+            <h2>收件人</h2>
+            <div class="col-sm-6">
+                <label for="recipientName" class="form-label">姓名</label>
+                <input type="text" class="form-control input-receiver" id="recipientName" name="recipient_name" placeholder="" value="{{user_name}}">
+                <div class="invalid-feedback">
+                    請填寫收件人姓名.
+                </div>
+            </div>
+
+            <div class="col-sm-7">
+                <label for="rrecipientPhone" class="form-label">聯絡電話</label>
+                <input type="text" class="form-control input-receiver" id="recipientPhone" name="recipient_phone" placeholder="" >
+                <div class="invalid-feedback">
+                    請填寫收件人姓名.
+                </div>
+            </div>
+
+            <div class="col-12">
+                <label for="recipientAddress" class="form-label">地址</label>
+                <input type="text" class="form-control input-receiver" id="recipientAddress" name="recipient_address" placeholder="" >
+                <div class="invalid-feedback">
                     請輸入收件人地址.
-                  </div>
                 </div>
-            
-              <hr class="my-4">
+            </div>
 
-              <h2>送禮人</h2>
-              <p class="lead">若是送禮需求請留下您的大名、電話，方便收禮人確認.</p>
-              <div class="col-sm-6">
+            <hr class="my-4">
+
+            <h2>送禮人</h2>
+            <p class="lead">若是送禮需求請留下您的大名、電話，方便收禮人確認.</p>
+            <div class="col-sm-6">
                 <label for="senderName" class="form-label">姓名</label>
                 <input type="text" class="form-control input-sender" id="senderName" name="sender_name" placeholder="" value="{{sender_name}}" >
                 <div class="invalid-feedback">
-                  請填寫送禮人姓名(選填)
+                    請填寫送禮人姓名(選填)
                 </div>
-              </div>
+            </div>
 
-              <div class="col-sm-7">
+            <div class="col-sm-7">
                 <label for="senderPhone" class="form-label">聯絡電話</label>
                 <input type="text" class="form-control input-sender" id="senderPhone" name="sender_phone" placeholder="" value="{{sender_phone}}" >
                 <div class="invalid-feedback">
-                  請填寫送禮人電話(選填)
+                    請填寫送禮人電話(選填)
                 </div>
-              </div>
             </div>
+        </div>
+    </div>
             <div class="spacer"></div>
           </div>
         </div>
+        <!--
             <button type="button" class="btn btn-primary" id="add-group-button">再新增一筆</button>
-
+!-->
             <h4 class="d-flex justify-content-between align-items-center mb-3">
               <span class="text-primary">購物車</span>
               <span id="total-quantity"class="badge bg-primary rounded-pill">0</span>
@@ -229,24 +324,23 @@
             <ul class="list-group mb-3">
               <li class="list-group-item d-flex justify-content-between lh-sm">
                 <div>
-                  <h6 class="my-0">特級文旦</h6>
+                  <h6 class="my-0">白柚10斤裝(約4~5入)</h6>
                   <small class="text-body-secondary" id="item1-quantity">*0</small>
                 </div>
                 <span>$<span class="text-body-secondary" id="item1-price">0</span></span>
               </li>
               <li class="list-group-item d-flex justify-content-between lh-sm">
                 <div>
-                  <h6 class="my-0">優級文旦</h6>
+                  <h6 class="my-0">白柚20斤裝(約7~10入)</h6>
                   <small class="text-body-secondary" id="item2-quantity">*0</small>
                 </div>
                 <span>$<span class="text-body-secondary" id="item2-price">0</span></span>
               </li>
               <li class="list-group-item d-flex justify-content-between bg-body-tertiary">
                 <div class="text-success">
-                  <h6 class="my-0">優惠</h6>
-                  <small>首購優惠</small>
+                  <h6 class="my-0">運費</h6>
                 </div>
-                <span>−$<span class="text-success" id="discount">0</span></span>
+                <span>$<span class="text-success" id="discount">0</span></span>
               </li>
               <li class="list-group-item d-flex justify-content-between">
                 <span>總金額</span>
@@ -255,6 +349,7 @@
             </ul>
 
               <input type="hidden" id="user_id" name="user_id" value="{{user_id}}" />
+
               <button class="w-100 btn btn-primary btn-lg" type="submit" value="Submit">送出訂單</button>
             </form>
           </div>
@@ -303,7 +398,7 @@ $(document).ready(function() {
         let total = 0;
         let item1_quantity = 0;
         let item2_quantity = 0;
-        let discount=0;
+        let discount=100;
         let maxQuantities = {
             item1: {{ item1_max_quantity }},
             item2: {{ item2_max_quantity }}
@@ -319,12 +414,13 @@ $(document).ready(function() {
                 }
             });
         });
-        discount = (item1_quantity * 40) + (item2_quantity * 30);
-        total_price = (item1_quantity * 800)+(item2_quantity * 600) - discount
+        if(((item1_quantity * 600)+(item2_quantity * 1200))>600)
+          discount=0;
+        total_price = (item1_quantity * 600)+(item2_quantity * 1200) + discount
         $('#total-quantity').text(item1_quantity + item2_quantity);
-        $('#item1-price').text(item1_quantity * 800);
+        $('#item1-price').text(item1_quantity * 600);
         $('#item1-quantity').text(item1_quantity+"箱");
-        $('#item2-price').text(item2_quantity * 600);
+        $('#item2-price').text(item2_quantity * 1200);
         $('#item2-quantity').text(item2_quantity+"箱");
         $('#discount').text(discount);
         $('#total_price').text(total_price);
@@ -400,25 +496,52 @@ $('.input-number').focusin(function(){
     
     $('#dataForm').on('submit', function(event) {
                 event.preventDefault(); // Prevent the default form submission
+                console.log("submit");
                 if (!validateGroupQuantities()) {
                             return;
                         }
                 // Serialize the form data
                  let groups = [];
-                $('.template-group').each(function(index) {
-                  let group = {
-                    groupId: index + 1,
-                    item1_quantity: parseInt($(this).find("input[name='item1_quantity']").val()) || 0,
-                    item2_quantity: parseInt($(this).find("input[name='item2_quantity']").val()) || 0,
+
+                  $('.template-group').each(function(index) {
+
+            // Check which radio button is selected for the current group
+            let selectedValue = document.querySelector('input[name="display_option"]:checked');
+            
+            let group = {};
+            if (selectedValue) {
+            if (selectedValue.id === 'purchaser_data') {
+                // If the purchaser_data radio button is selected, read data from purchaserBlock
+                group = {
+                    recipient_name: $('#purchaserBlock').find('#recipient_name').text().replace('收件人: ', ''),
+                    recipient_phone: $('#purchaserBlock').find('#recipient_phone').text().replace('收件電話: ', ''),
+                    recipient_address: $('#purchaserBlock').find('#recipient_address').text().replace('收件地址: ', ''),
+                    sender_name: $('#purchaserBlock').find('#sender_name').text().replace('送禮人: ', ''),
+                    sender_phone: $('#purchaserBlock').find('#sender_phone').text().replace('送禮人電話: ', '')
+                };
+            } else if (selectedValue.id === 'form_data') {
+                // Otherwise, read data from the form inputs within this template-group
+                group = {
                     recipient_name: $(this).find("input[name='recipient_name']").val(),
                     recipient_phone: $(this).find("input[name='recipient_phone']").val(),
                     recipient_address: $(this).find("input[name='recipient_address']").val(),
                     sender_name: $(this).find("input[name='sender_name']").val(),
                     sender_phone: $(this).find("input[name='sender_phone']").val(),
-                    total_price: (parseInt($(this).find("input[name='item1_quantity']").val()) || 0)*760+(parseInt($(this).find("input[name='item2_quantity']").val()) || 0)*570
-                  };
-                  groups.push(group);
-                });
+                };
+            }
+            }
+            // Add other fields like groupId and total_price as needed
+            group.groupId = index + 1;  // Use the index as groupId
+            group.item1_quantity = parseInt($(this).find("input[name='item1_quantity']").val()) || 0;
+            group.item2_quantity = parseInt($(this).find("input[name='item2_quantity']").val()) || 0;
+            freight=100;
+            if(((group.item1_quantity * 600) + (group.item2_quantity * 1200))>600)
+              freight = 0;
+            group.total_price = (group.item1_quantity * 600) + (group.item2_quantity * 1200) + freight;
+
+            // Push the group data into the groups array
+            groups.push(group);
+        });
                 let data = {
                   user_id: '{{user_id}}',
                   user_name: '{{user_name}}',
@@ -439,11 +562,66 @@ $('.input-number').focusin(function(){
                   error: function(jqXHR, textStatus, errorThrown) {
                       alert('訂單成立失敗，請聯絡我們');
                   }
-              });           
+              });  
+                      
           });
-            
+                      
         });
+      function toggleDisplay() {
+        var purchaserBlock = document.getElementById('purchaserBlock');
+        var formBlock = document.getElementById('formBlock');
 
+        var purchaserRadio = document.getElementById('purchaser_data').checked;
+        var formRadio = document.getElementById('form_data').checked;
+
+        // Toggle display based on the radio button selection
+            if (purchaserRadio) {
+                purchaserBlock.style.display = 'block';
+                formBlock.style.display = 'none';
+            } else if (formRadio) {
+                purchaserBlock.style.display = 'none';
+                formBlock.style.display = 'block';
+            } else {
+                purchaserBlock.style.display = 'none';
+                formBlock.style.display = 'none';
+            }
+    }
+    // Automatically select default block based on data_list
+    window.onload = function() {
+        var dataList = {{ data_list|tojson }};
+        var purchaserRadio = document.getElementById('purchaser_data');
+        var formRadio = document.getElementById('form_data');
+
+        // If data_list is not empty, select purchaserBlock by default
+        if (dataList && dataList.length > 0) {
+            purchaserRadio.checked = true;
+            toggleDisplay(); // Show purchaserBlock
+        } else {
+            formRadio.checked = true;
+            toggleDisplay(); // Show formBlock
+        }
+    }
+        // Function to update the data-block based on selected radio button in modal
+    function updateDataBlock() { 
+        console.log("updateDataBlock");
+        var selectedOption = document.querySelector('input[name="data_choice"]:checked');
+        var selectedIndex = selectedOption.value;
+        var dataList = {{ data_list|tojson }};
+
+        // Get the selected data from the data_list based on the selected index
+        var selectedData = dataList[selectedIndex];
+
+        // Update the purchaserBlock with the selected data
+        document.getElementById('recipient_name').innerText = '收件人: ' + selectedData.recipient_name;
+        document.getElementById('recipient_phone').innerText = '收件電話: ' + selectedData.recipient_phone;
+        document.getElementById('recipient_address').innerText = '收件地址: ' + selectedData.recipient_address;
+        document.getElementById('sender_name').innerText = '送禮人: ' + selectedData.sender_name;
+        document.getElementById('sender_phone').innerText = '送禮人電話: ' + selectedData.sender_phone;
+
+        // Close the modal after submission
+        var modal = new bootstrap.Modal(document.getElementById('popupModal'));
+        modal.hide();
+    }
   </script>
     <script src="{{url_for('static',filename='checkout.js')}}"></script>
   </body>
