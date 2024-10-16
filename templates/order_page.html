@@ -205,6 +205,10 @@
           </tbody></table>
     <!-- Radio buttons group with Bootstrap -->
     <div class="radio-group">
+          <div class="form-check">
+            <input class="form-check-input" type="radio" id="form_data" name="display_option" value="form" onclick="toggleDisplay()">
+            <label class="form-check-label" for="form_data">自行填寫</label>
+        </div>
         <div class="form-check">
             <input class="form-check-input" type="radio" id="purchaser_data" name="display_option" value="purchaser" onclick="toggleDisplay()">
             <label class="form-check-label" for="purchaser_data">從歷史資料選擇</label>
@@ -214,7 +218,7 @@
             <button type="button" class="btn btn-primary change-btn position-absolute" 
                     data-bs-toggle="modal" data-bs-target="#popupModal" 
                     style="top: 0; right: 0;">
-                歷史資料
+                重新選擇
             </button>
 
             <!-- Content for recipient and sender details -->
@@ -224,12 +228,8 @@
             <p id="sender_name">送禮人: {{ data_list[0]['sender_name'] }}</p>
             <p id="sender_phone">送禮人電話: {{ data_list[0]['sender_phone'] }}</p>
         </div>
-
-        <div class="form-check">
-            <input class="form-check-input" type="radio" id="form_data" name="display_option" value="form" onclick="toggleDisplay()">
-            <label class="form-check-label" for="form_data">自行填寫</label>
-        </div>
     </div>
+
 
 <!-- Bootstrap Modal for Pop-up -->
 <div class="modal fade" id="popupModal" tabindex="-1" aria-labelledby="popupModalLabel" aria-hidden="true">
