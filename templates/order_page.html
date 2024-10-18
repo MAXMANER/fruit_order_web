@@ -222,11 +222,41 @@
             </button>
 
             <!-- Content for recipient and sender details -->
-            <p id="recipient_name">收件人: {{ data_list[0]['recipient_name'] }}</p>
-            <p id="recipient_phone">收件電話: {{ data_list[0]['recipient_phone'] }}</p>
-            <p id="recipient_address">收件地址: {{ data_list[0]['recipient_address'] }}</p>
-            <p id="sender_name">送禮人: {{ data_list[0]['sender_name'] }}</p>
-            <p id="sender_phone">送禮人電話: {{ data_list[0]['sender_phone'] }}</p>
+            <p id="recipient_name">收件人: 
+              {% if data_list and data_list[0] %}
+                {{ data_list[0]['recipient_name'] }}
+              {% else %}
+                No recipient
+              {% endif %}
+            </p>
+            <p id="recipient_phone">收件電話: 
+              {% if data_list and data_list[0] %}
+                {{ data_list[0]['recipient_phone'] }}
+              {% else %}
+                No recipient
+              {% endif %}
+            </p>
+            <p id="recipient_address">收件地址: 
+              {% if data_list and data_list[0] %}
+                {{ data_list[0]['recipient_address'] }}
+              {% else %}
+                No recipient
+              {% endif %}
+            </p>
+            <p id="sender_name">送禮人: 
+              {% if data_list and data_list[0] %}
+                {{ data_list[0]['sender_name'] }}
+              {% else %}
+                No recipient
+              {% endif %}
+            </p>
+            <p id="sender_phone">送禮人電話: 
+              {% if data_list and data_list[0] %}
+                {{ data_list[0]['sender_phone'] }}
+              {% else %}
+                No recipient
+              {% endif %}
+            </p>
         </div>
     </div>
 
@@ -594,16 +624,19 @@ $('.input-number').focusin(function(){
         var dataList = {{ data_list|tojson }};
         var purchaserRadio = document.getElementById('purchaser_data');
         var formRadio = document.getElementById('form_data');
+        console.log(dataList);
 
-        // If data_list is not empty, select purchaserBlock by default
-        if (dataList && dataList.length > 0) {
+        // Check if data_list is not empty and has at least one element
+        if (Array.isArray(dataList) && dataList.length > 0) {
             purchaserRadio.checked = true;
+            purchaserRadio.disabled = false;
             toggleDisplay(); // Show purchaserBlock
         } else {
             formRadio.checked = true;
+            purchaserRadio.disabled = true;
             toggleDisplay(); // Show formBlock
         }
-    }
+    };
         // Function to update the data-block based on selected radio button in modal
     function updateDataBlock() { 
         console.log("updateDataBlock");
