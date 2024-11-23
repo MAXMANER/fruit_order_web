@@ -163,9 +163,9 @@
           <div class="row g-3 template-group" id="template-group">
             <table class="shop_table" cellspacing="0">    
               <tbody><tr class="product-item ">
-                  <td class="product-name">白柚10斤裝(約4~5入)</td>
+                  <td class="product-name">柳丁10斤裝</td>
                   <td class="product-price">
-                      <span itemprop="price" class="price"><span class="woocommerce-Price-amount amount"><span class="woocommerce-Price-currencySymbol">NT$</span>600</span> 
+                      <span itemprop="price" class="price"><span class="woocommerce-Price-amount amount"><span class="woocommerce-Price-currencySymbol">NT$</span>300</span> 
                       <!--
                       <ins><del><span class="woocommerce-Price-amount amount"><span class="woocommerce-Price-currencySymbol">NT$</span>800</span></del></ins></span>
                       !-->
@@ -184,12 +184,12 @@
               <tr class="product-item ">
       
       
-                  <td class="product-name">白柚20斤裝(約7~10入)</td>
+                  <td class="product-name">柳丁20斤裝</td>
       
                   <td class="product-price">
-                      <span itemprop="price" class="price"><span class="woocommerce-Price-amount amount"><span class="woocommerce-Price-currencySymbol">NT$</span>1200</span> 
+                      <span itemprop="price" class="price"><span class="woocommerce-Price-amount amount"><span class="woocommerce-Price-currencySymbol">NT$</span>550</span> 
                       <!--
-                      <ins><del><span class="woocommerce-Price-amount amount"><span class="woocommerce-Price-currencySymbol">NT$</span>600</span></del></ins></span>
+                      <ins><del><span class="woocommerce-Price-amount amount"><span class="woocommerce-Price-currencySymbol">NT$</span>300</span></del></ins></span>
                       !-->
                   </td>
       
@@ -357,14 +357,14 @@
             <ul class="list-group mb-3">
               <li class="list-group-item d-flex justify-content-between lh-sm">
                 <div>
-                  <h6 class="my-0">白柚10斤裝(約4~5入)</h6>
+                  <h6 class="my-0">柳丁10斤裝</h6>
                   <small class="text-body-secondary" id="item1-quantity">*0</small>
                 </div>
                 <span>$<span class="text-body-secondary" id="item1-price">0</span></span>
               </li>
               <li class="list-group-item d-flex justify-content-between lh-sm">
                 <div>
-                  <h6 class="my-0">白柚20斤裝(約7~10入)</h6>
+                  <h6 class="my-0">柳丁20斤裝</h6>
                   <small class="text-body-secondary" id="item2-quantity">*0</small>
                 </div>
                 <span>$<span class="text-body-secondary" id="item2-price">0</span></span>
@@ -431,7 +431,7 @@ $(document).ready(function() {
         let total = 0;
         let item1_quantity = 0;
         let item2_quantity = 0;
-        let discount=100;
+        let discount=0;
         let maxQuantities = {
             item1: {{ item1_max_quantity }},
             item2: {{ item2_max_quantity }}
@@ -447,13 +447,13 @@ $(document).ready(function() {
                 }
             });
         });
-        if(((item1_quantity * 600)+(item2_quantity * 1200))>600)
-          discount=0;
-        total_price = (item1_quantity * 600)+(item2_quantity * 1200) + discount
+        //if(((item1_quantity * 300)+(item2_quantity * 550))>300)
+          //discount=0;
+        total_price = (item1_quantity * 300)+(item2_quantity * 550) + discount
         $('#total-quantity').text(item1_quantity + item2_quantity);
-        $('#item1-price').text(item1_quantity * 600);
+        $('#item1-price').text(item1_quantity * 300);
         $('#item1-quantity').text(item1_quantity+"箱");
-        $('#item2-price').text(item2_quantity * 1200);
+        $('#item2-price').text(item2_quantity * 550);
         $('#item2-quantity').text(item2_quantity+"箱");
         $('#discount').text(discount);
         $('#total_price').text(total_price);
@@ -567,10 +567,10 @@ $('.input-number').focusin(function(){
             group.groupId = index + 1;  // Use the index as groupId
             group.item1_quantity = parseInt($(this).find("input[name='item1_quantity']").val()) || 0;
             group.item2_quantity = parseInt($(this).find("input[name='item2_quantity']").val()) || 0;
-            freight=100;
-            if(((group.item1_quantity * 600) + (group.item2_quantity * 1200))>600)
-              freight = 0;
-            group.total_price = (group.item1_quantity * 600) + (group.item2_quantity * 1200) + freight;
+            freight=0;
+            //if(((group.item1_quantity * 300) + (group.item2_quantity * 550))>300)
+              //freight = 0;
+            group.total_price = (group.item1_quantity * 300) + (group.item2_quantity * 550) + freight;
 
             // Push the group data into the groups array
             groups.push(group);
