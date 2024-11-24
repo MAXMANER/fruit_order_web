@@ -278,8 +278,8 @@
                 收件人姓名: {{ item['recipient_name'] }}<br>
                 收件電話: {{ item['recipient_phone'] }}<br>
                 收件地址: {{ item['recipient_address'] }}<br>
-                送禮人姓名: {{ item['sender_name'] }}<br>
-                送禮人電話: {{ item['sender_phone'] }}
+                送禮人姓名: {{ item['sender_name'] if item['sender_name'] else ''}}<br>
+                送禮人電話: {{ item['sender_phone'] if item['sender_phone'] else ''}}
             </label>
         </div>
         {% endfor %}
