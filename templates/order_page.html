@@ -546,20 +546,20 @@ $('.input-number').focusin(function(){
             if (selectedValue.id === 'purchaser_data') {
                 // If the purchaser_data radio button is selected, read data from purchaserBlock
                 group = {
-                    recipient_name: $('#purchaserBlock').find('#recipient_name').text().replace('收件人: ', ''),
-                    recipient_phone: $('#purchaserBlock').find('#recipient_phone').text().replace('收件電話: ', ''),
-                    recipient_address: $('#purchaserBlock').find('#recipient_address').text().replace('收件地址: ', ''),
-                    sender_name: $('#purchaserBlock').find('#sender_name').text().replace('送禮人: ', ''),
-                    sender_phone: $('#purchaserBlock').find('#sender_phone').text().replace('送禮人電話: ', '')
+                    recipient_name: $('#purchaserBlock').find('#recipient_name').text().replace('收件人: ', '').trim(),
+                    recipient_phone: $('#purchaserBlock').find('#recipient_phone').text().replace('收件電話: ', '').trim(),
+                    recipient_address: $('#purchaserBlock').find('#recipient_address').text().replace('收件地址: ', '').trim(),
+                    sender_name: $('#purchaserBlock').find('#sender_name').text().replace('送禮人: ', '').trim(),
+                    sender_phone: $('#purchaserBlock').find('#sender_phone').text().replace('送禮人電話: ', '').trim()
                 };
             } else if (selectedValue.id === 'form_data') {
                 // Otherwise, read data from the form inputs within this template-group
                 group = {
-                    recipient_name: $(this).find("input[name='recipient_name']").val(),
-                    recipient_phone: $(this).find("input[name='recipient_phone']").val(),
-                    recipient_address: $(this).find("input[name='recipient_address']").val(),
-                    sender_name: $(this).find("input[name='sender_name']").val(),
-                    sender_phone: $(this).find("input[name='sender_phone']").val(),
+                    recipient_name: $(this).find("input[name='recipient_name']").val().trim(),
+                    recipient_phone: $(this).find("input[name='recipient_phone']").val().trim(),
+                    recipient_address: $(this).find("input[name='recipient_address']").val().trim(),
+                    sender_name: $(this).find("input[name='sender_name']").val().trim(),
+                    sender_phone: $(this).find("input[name='sender_phone']").val().trim(),
                 };
             }
             }
