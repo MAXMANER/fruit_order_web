@@ -1,0 +1,415 @@
+<!doctype html>
+<html lang="zh-Hant" data-bs-theme="auto">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>老朱果園訂購</title>
+
+    <!-- Bootstrap core -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='bootstrap/css/bootstrap.min.css') }}" />
+    <script src="{{ url_for('static', filename='jquery-3.7.1.min.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='bootstrap/js/bootstrap.bundle.min.js') }}" defer></script>
+
+    <style>
+      body { background: var(--bs-body-bg); }
+      .product-card { border-radius: 1rem; }
+      .qty-input .btn { min-width: 40px; }
+      .qty-input input[type=number] { text-align: center; }
+      .remaining { font-size: .85rem; opacity: .8; }
+      .sticky-summary { position: sticky; top: 1rem; }
+      .section-title { display: flex; align-items: center; gap: .5rem; }
+      .section-title .dot { width: .75rem; height: .75rem; border-radius: 50%; background: var(--bs-primary); display: inline-block; }
+      .list-striped > .list-group-item:nth-child(odd) { background-color: rgba(0,0,0,.02); }
+    </style>
+  </head>
+  <body>
+    <header class="py-4 border-bottom mb-4">
+      <div class="container d-flex align-items-center justify-content-between">
+        <div class="d-flex align-items-center gap-3">
+          <img src="{{ url_for('static', filename='img/logo.png') }}" alt="老朱果園 Logo" width="56" height="56" />
+          <div>
+            <h1 class="h4 mb-0">老朱果園訂購</h1>
+            <small class="text-body-secondary">旬味文旦・產地直送</small>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <main class="container pb-5">
+      <form id="orderForm" class="row g-4" action="{{ url_for('qrcode_page') }}" method="get" novalidate>
+        <!-- Products -->
+        <section class="col-lg-8">
+          <div class="section-title mb-2"><span class="dot"></span><h2 class="h5 mb-0">選購商品</h2></div>
+
+          <!-- 動態品項容器：由 API 產生卡片 -->
+          <div id="productsContainer" class="vstack gap-3"></div>
+
+          <!-- 收件方式 -->
+          <div class="mt-4">
+          <div class="mt-4">
+            <div class="section-title mb-2"><span class="dot"></span><h2 class="h5 mb-0">收件資訊</h2></div>
+            <div class="row g-3 align-items-start">
+              <div class="col-12">
+                <div class="form-check form-check-inline">
+                  <input class="form-check-input" type="radio" id="opt_form" name="display_option" value="form" />
+                  <label class="form-check-label" for="opt_form">自行填寫</label>
+                </div>
+                <div class="form-check form-check-inline">
+                  <input class="form-check-input" type="radio" id="opt_purchaser" name="display_option" value="purchaser" />
+                  <label class="form-check-label" for="opt_purchaser">從歷史資料選擇</label>
+                </div>
+              </div>
+              <!-- 歷史資料卡 -->
+              <div class="col-12 d-none" id="purchaserBlock">
+                <div class="card border-0 shadow-sm">
+                  <div class="card-body position-relative">
+                    <button type="button" class="btn btn-sm btn-primary position-absolute" style="top: .75rem; right: .75rem" data-bs-toggle="modal" data-bs-target="#addrModal">重新選擇</button>
+                    <div class="row g-2">
+                      <div class="col-md-6">
+                        <div class="fw-semibold">收件人</div>
+                        <div id="recipient_name">{% if data_list and data_list[0] %}{{ data_list[0]['recipient_name'] }}{% else %}未選擇{% endif %}</div>
+                        <div id="recipient_phone">{% if data_list and data_list[0] %}{{ data_list[0]['recipient_phone'] }}{% else %}未選擇{% endif %}</div>
+                        <div id="recipient_address">{% if data_list and data_list[0] %}{{ data_list[0]['recipient_address'] }}{% else %}未選擇{% endif %}</div>
+                      </div>
+                      <div class="col-md-6">
+                        <div class="fw-semibold">送禮人（選填）</div>
+                        <div id="sender_name">{% if data_list and data_list[0] %}{{ data_list[0]['sender_name'] }}{% else %}—{% endif %}</div>
+                        <div id="sender_phone">{% if data_list and data_list[0] %}{{ data_list[0]['sender_phone'] }}{% else %}—{% endif %}</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 自行填寫表單 -->
+              <div class="col-12 d-none" id="formBlock">
+                <div class="card border-0 shadow-sm">
+                  <div class="card-body">
+                    <div class="row g-3">
+                      <div class="col-md-6">
+                        <label for="recipientName" class="form-label">收件人姓名</label>
+                        <input type="text" class="form-control" id="recipientName" name="recipient_name" value="{{ user_name }}" required />
+                        <div class="invalid-feedback">請填寫收件人姓名</div>
+                      </div>
+                      <div class="col-md-6">
+                        <label for="recipientPhone" class="form-label">收件人電話</label>
+                        <input type="tel" class="form-control" id="recipientPhone" name="recipient_phone"  required />
+                        <div class="invalid-feedback">請填寫收件人電話</div>
+                      </div>
+                      <div class="col-12">
+                        <label for="recipientAddress" class="form-label">收件人地址</label>
+                        <input type="text" class="form-control" id="recipientAddress" name="recipient_address" required />
+                        <div class="invalid-feedback">請填寫收件人地址</div>
+                      </div>
+                      <div class="col-md-6">
+                        <label for="senderName" class="form-label">送禮人姓名（選填）</label>
+                        <input type="text" class="form-control" id="senderName" name="sender_name" value="{{ sender_name }}" />
+                      </div>
+                      <div class="col-md-6">
+                        <label for="senderPhone" class="form-label">送禮人電話（選填）</label>
+                        <input type="tel" class="form-control" id="senderPhone" name="sender_phone" value="{{ sender_phone }}" />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Summary -->
+        <aside class="col-lg-4">
+          <div class="sticky-summary">
+            <div class="section-title mb-2"><span class="dot"></span><h2 class="h5 mb-0">購物車</h2></div>
+            <ul class="list-group list-striped mb-3" id="cartList">
+              <!-- 動態購物車項目由 JS 產生 -->
+            </ul>
+            <input type="hidden" id="user_id" name="user_id" value="{{ user_id }}" />
+            <button class="btn btn-primary btn-lg w-100" type="submit">送出訂單</button>
+            <div class="text-center mt-2 text-body-secondary small">共 <span id="totalCount">0</span> 箱</div>
+          </div>
+        </aside>
+      </form>
+    </main>
+    <!-- 地址選擇 Modal -->
+    <div class="modal fade" id="addrModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">選擇寄送地址</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="關閉"></button>
+          </div>
+          <div class="modal-body">
+            <div class="vstack gap-2">
+              {% for item in data_list %}
+              <label class="list-group-item list-group-item-action d-flex gap-3 align-items-start" style="cursor:pointer">
+                <input class="form-check-input mt-1" type="radio" name="data_choice" value="{{ loop.index0 }}" />
+                <div>
+                  <div class="fw-semibold">{{ item['recipient_name'] }} ‧ {{ item['recipient_phone'] }}</div>
+                  <div class="small text-body-secondary">{{ item['recipient_address'] }}</div>
+                  <div class="small">送禮人：{{ item['sender_name'] or '—' }} {{ item['sender_phone'] or '' }}</div>
+                </div>
+              </label>
+              {% endfor %}
+              {% if not data_list or data_list|length == 0 %}
+              <div class="text-body-secondary">目前沒有歷史資料。</div>
+              {% endif %}
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-primary" id="addrConfirm" data-bs-dismiss="modal">確定</button>
+            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">取消</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script>
+      // ====== 動態商品：由 API 取得 ======
+      const ITEM_API_URL = '{{ item_api_url }}'; // 後端注入：例如 url_for('api_items')
+      let ITEMS = [];          // 從 API 取得的品項（含 item_id/name/price/quantity/comment/weight）
+      const STATE = new Map(); // key=item_id, value={qty, max}
+
+      function clamp(val, min, max){ return Math.min(Math.max(val, min), max); }
+      function fmt(n){ return (n||0).toLocaleString('zh-Hant-TW'); }
+
+      function shippingFee(qty){
+        if (totalCount == 0) 
+          return 0; // 可選
+        return qty == 1 ? 80 : 0;
+      }
+
+      function renderProducts(){
+        const wrap = document.getElementById('productsContainer');
+        wrap.innerHTML = '';
+        ITEMS.forEach(item => {
+          const max = Number(item.quantity)||0;
+          STATE.set(item.item_id, { qty: 0, max });
+
+          const card = document.createElement('article');
+          card.className = 'card product-card shadow-sm';
+          card.innerHTML = `
+            <div class="card-body d-grid gap-2 gap-md-3">
+              <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between">
+                <div class="me-md-3">
+                  <h3 class="h6 mb-1">${item.name}${item.weight?`（${item.weight} 斤）`:''}</h3>
+                  <div class="text-body-secondary">單價 NT$ <strong data-price="${item.price}">${fmt(item.price)}</strong></div>
+                  ${item.comment?`<div class="small text-body-secondary">${item.comment}</div>`:''}
+                </div>
+                <div class="qty-input input-group w-auto ms-md-auto" data-item-id="${item.item_id}">
+                  <button type="button" class="btn btn-outline-secondary btn-number" data-type="minus" aria-label="減少數量">−</button>
+                  <input type="number" class="form-control" id="item-${item.item_id}-quantity" name="item_${item.item_id}_quantity" min="0" max="${max}" value="0" inputmode="numeric" pattern="[0-9]*" ${max===0?'disabled':''} />
+                  <button type="button" class="btn btn-outline-secondary btn-number" data-type="plus" aria-label="增加數量" ${max===0?'disabled':''}>＋</button>
+                </div>
+              </div>
+              <div class="text-end remaining" id="remain-${item.item_id}">剩餘 ${max}</div>
+            </div>`;
+          wrap.appendChild(card);
+        });
+
+        // 綁定事件（加減 / 輸入）
+        wrap.querySelectorAll('.btn-number').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const type = btn.getAttribute('data-type');
+            const group = btn.closest('.qty-input');
+            const id = Number(group.getAttribute('data-item-id'));
+            const input = group.querySelector('input[type=number]');
+            const st = STATE.get(id);
+            const next = clamp((st?.qty||0) + (type==='plus'?1:-1), 0, st?.max||0);
+            st.qty = next; input.value = next;
+            updateRemain(id); recalc();
+          });
+        });
+        wrap.querySelectorAll('input[type=number]').forEach(el => {
+          el.addEventListener('input', () => { el.value = el.value.replace(/[^0-9]/g,''); });
+          el.addEventListener('change', () => {
+            const id = Number(el.id.split('-')[1]);
+            const st = STATE.get(id);
+            const v = clamp(parseInt(el.value||'0',10)||0, 0, st?.max||0);
+            st.qty = v; el.value = v; updateRemain(id); recalc();
+          });
+        });
+      }
+
+      function updateRemain(id){
+        const st = STATE.get(id);
+        const remainEl = document.getElementById(`remain-${id}`);
+        if(remainEl) remainEl.textContent = `剩餘 ${(st?.max||0) - (st?.qty||0)}`;
+      }
+
+      function recalc(){
+        // 小計
+        let subtotal = 0, totalCount = 0;
+        const cart = [];
+        ITEMS.forEach(it => {
+          const st = STATE.get(it.item_id) || {qty:0,max:0};
+          const s = st.qty * it.price;
+          subtotal += s; totalCount += st.qty;
+          cart.push({ name: it.name, qty: st.qty, sum: s, item_id: it.item_id });
+        });
+        //目前收取單項item3運費
+        const qty = (STATE.get(3)?.qty ?? 0);
+        const ship = shippingFee(qty);
+        const grand = subtotal + ship;
+        renderCart(cart, ship, grand, totalCount);
+      }
+
+      function renderCart(cartItems, ship, grand, totalCount){
+        const ul = document.getElementById('cartList');
+        ul.innerHTML = '';
+        cartItems.forEach(ci => {
+          const li = document.createElement('li');
+          li.className = 'list-group-item d-flex justify-content-between align-items-center';
+          li.innerHTML = `<div><div>${ci.name}</div><small class="text-body-secondary">×${ci.qty}</small></div><strong>NT$ <span>${fmt(ci.sum)}</span></strong>`;
+          ul.appendChild(li);
+        });
+        // 運費
+        const shipLi = document.createElement('li');
+        shipLi.className = 'list-group-item d-flex justify-content-between align-items-center';
+        shipLi.innerHTML = `<div class="text-success">運費</div><strong class="text-success">NT$ <span>${fmt(ship)}</span></strong>`;
+        ul.appendChild(shipLi);
+        // 總金額
+        const totalLi = document.createElement('li');
+        totalLi.className = 'list-group-item d-flex justify-content-between align-items-center';
+        totalLi.innerHTML = `<div class="fw-semibold">總金額</div><div class="fw-bold">NT$ <span>${fmt(grand)}</span></div>`;
+        ul.appendChild(totalLi);
+        document.getElementById('totalCount').textContent = totalCount;
+        const grandEl = document.getElementById('grand');
+        if (grandEl) grandEl.textContent = fmt(grand);
+        const shipEl = document.getElementById('ship');
+        if (shipEl) shipEl.textContent = fmt(ship);
+      }
+
+      async function loadItems() {
+        try {
+          const res = await fetch("{{ item_api_url }}");
+
+          if (!res.ok) {
+            throw new Error("HTTP 錯誤狀態：" + res.status);
+          }
+
+          const data = await res.json();
+
+          // 支援兩種格式：純陣列 或 { items, pagination, status }
+          const items = Array.isArray(data) ? data : (data.items || []);
+
+          ITEMS = items;
+          renderProducts();
+          recalc();
+        } catch (err) {
+          console.error("loadItems 發生錯誤：", err);
+          showError("品項載入失敗，請稍後再試");
+        }
+      }
+
+      function showError(msg) {
+        const el = document.querySelector("#items-error");
+        if (el) el.textContent = msg;
+      }
+
+      document.addEventListener("DOMContentLoaded", loadItems);
+
+
+      // ====== 原有表單收件區塊切換 & 送單流程保留 ======
+      function toggleBlocks(){
+        const form = document.getElementById('formBlock');
+        const pur = document.getElementById('purchaserBlock');
+        const isPur = document.getElementById('opt_purchaser').checked;
+        form.classList.toggle('d-none', isPur);
+        pur.classList.toggle('d-none', !isPur);
+      }
+
+      document.addEventListener('DOMContentLoaded', async function(){
+        // 依 data_list 決定預設顯示
+        const dataList = {{ data_list|tojson }};
+        const optPur = document.getElementById('opt_purchaser');
+        const optForm = document.getElementById('opt_form');
+        if (Array.isArray(dataList) && dataList.length > 0) { optPur.checked = true; } else { optForm.checked = true; optPur.disabled = true; }
+        toggleBlocks();
+        document.getElementById('opt_form').addEventListener('change', toggleBlocks);
+        document.getElementById('opt_purchaser').addEventListener('change', toggleBlocks);
+
+        // 載入品項並渲染
+        await loadItems();
+
+        // Modal 確認地址
+        const addrConfirm = document.getElementById('addrConfirm');
+        if(addrConfirm){
+          addrConfirm.addEventListener('click', () => {
+            const selected = document.querySelector('input[name="data_choice"]:checked');
+            if(!selected) return;
+            const idx = parseInt(selected.value, 10);
+            const d = dataList[idx];
+            if(!d) return;
+            document.getElementById('recipient_name').textContent = d.recipient_name || '—';
+            document.getElementById('recipient_phone').textContent = d.recipient_phone || '—';
+            document.getElementById('recipient_address').textContent = d.recipient_address || '—';
+            document.getElementById('sender_name').textContent = d.sender_name || '—';
+            document.getElementById('sender_phone').textContent = d.sender_phone || '—';
+          });
+        }
+
+        // 送單：改為將動態品項回傳
+        document.getElementById('orderForm').addEventListener('submit', function(ev){
+          ev.preventDefault();
+
+          // 至少 1 箱
+          let totalQty = 0; STATE.forEach(v => totalQty += (v.qty||0));
+          if(totalQty <= 0){ alert('請至少選購 1 箱'); return; }
+
+          // 收件資訊
+          const usePur = document.getElementById('opt_purchaser').checked;
+          let group = {};
+          if (usePur) {
+            group = {
+              recipient_name: document.getElementById('recipient_name').textContent.trim(),
+              recipient_phone: document.getElementById('recipient_phone').textContent.trim(),
+              recipient_address: document.getElementById('recipient_address').textContent.trim(),
+              sender_name: document.getElementById('sender_name').textContent.trim(),
+              sender_phone: document.getElementById('sender_phone').textContent.trim()
+            };
+          } else {
+            const rn = document.getElementById('recipientName');
+            const rp = document.getElementById('recipientPhone');
+            const ra = document.getElementById('recipientAddress');
+            if(!rn.checkValidity() || !rp.checkValidity() || !ra.checkValidity()){
+              this.classList.add('was-validated');
+              alert('請完整填寫收件資訊');
+              return;
+            }
+            group = {
+              recipient_name: rn.value.trim(),
+              recipient_phone: rp.value.trim(),
+              recipient_address: ra.value.trim(),
+              sender_name: document.getElementById('senderName').value.trim(),
+              sender_phone: document.getElementById('senderPhone').value.trim()
+            };
+          }
+
+          // 組裝 items 與總價
+          const orderItems = [];
+          let subtotal = 0;
+          ITEMS.forEach(it => {
+            const st = STATE.get(it.item_id)||{qty:0,max:0};
+            if(st.qty>0){
+              orderItems.push({ item_id: it.item_id, name: it.name, price: it.price, quantity: st.qty, weight: it.weight||null, comment: it.comment||'' });
+              subtotal += st.qty * it.price;
+            }
+          });
+          const freight = shippingFee(subtotal);
+          group.items = orderItems;
+          group.total_price = subtotal + freight;
+          group.freight = freight;
+
+          const payload = { user_id: '{{ user_id }}', user_name: '{{ user_name }}', groups: [group] };
+          $.ajax({
+            type: 'POST',
+            url: '{{ save_data_url }}' + '/save_data',
+            contentType: 'application/json',
+            data: JSON.stringify(payload)
+          }).done(() => { this.submit(); })
+            .fail(() => { alert('訂單成立失敗，請稍後再試或聯絡我們'); });
+        });
+      });
+    </script>
+  </body>
+</html>
