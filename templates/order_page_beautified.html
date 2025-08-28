@@ -29,7 +29,7 @@
           <img src="{{ url_for('static', filename='img/logo.png') }}" alt="老朱果園 Logo" width="56" height="56" />
           <div>
             <h1 class="h4 mb-0">老朱果園訂購</h1>
-            <small class="text-body-secondary">旬味文旦・產地直送</small>
+            <small class="text-body-secondary">美味文旦・產地直送</small>
           </div>
         </div>
       </div>
@@ -281,7 +281,9 @@
 
       async function loadItems() {
         try {
-          const res = await fetch("{{ item_api_url }}");
+          const res = await fetch("{{ item_api_url }}", {
+            headers: { "ngrok-skip-browser-warning": "true" }
+          });
 
           if (!res.ok) {
             throw new Error("HTTP 錯誤狀態：" + res.status);
