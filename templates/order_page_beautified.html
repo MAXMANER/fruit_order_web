@@ -397,7 +397,9 @@
               subtotal += st.qty * it.price;
             }
           });
-          const freight = shippingFee(subtotal);
+          //目前收取單項item3運費
+          const qty = (STATE.get(3)?.qty ?? 0);
+          const freight = shippingFee(qty);
           group.items = orderItems;
           group.total_price = subtotal + freight;
           group.freight = freight;

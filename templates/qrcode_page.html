@@ -21,13 +21,15 @@
     </style>
 </head>
 <body>
-        <form id="form" action="{{url_for('home')}}" method="get">
+        <form id="form" action="{{url_for('order_page')}}" method="get">
             <div class="spacer"></div>
             <div class="col-md-4 col-lg-8">
                 <h2>感謝您的訂購</h2>
                 <h4>請轉帳到以下帳戶</h4><br><h2 style="color:red">銀行代碼：008<br>華南商銀麻豆分行621200092131</h2><br><h4>並在line回覆轉帳截圖或交易末五碼<br>商品將依照訂購順序寄出</h4>
                 <div class="container text-center">
-                <img class="d-block mx-auto mb-4" src="../static/img/bank_qrcode.jpg" alt="" width="200" height="200">
+                <img class="d-block mx-auto mb-4"
+                    src="{{ url_for('static', filename='img/bank_qrcode.jpg') }}"
+                    alt="匯款QRCode" width="200" height="200">
                 <div class="button-container">
                     <button type="submit"class="btn btn-primary">再新增一筆</button>
                 </div>
