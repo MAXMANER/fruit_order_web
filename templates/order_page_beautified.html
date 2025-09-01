@@ -73,8 +73,12 @@
                       </div>
                       <div class="col-md-6">
                         <div class="fw-semibold">送禮人（選填）</div>
-                        <div id="sender_name">{% if data_list and data_list[0] %}{{ data_list[0]['sender_name'] }}{% else %}—{% endif %}</div>
-                        <div id="sender_phone">{% if data_list and data_list[0] %}{{ data_list[0]['sender_phone'] }}{% else %}—{% endif %}</div>
+                        <div id="sender_name">
+                          {% if data_list and data_list[0] %}{{ data_list[0]['sender_name']|default('', true) }}{% else %}{% endif %}
+                        </div>
+                        <div id="sender_phone">
+                          {% if data_list and data_list[0] %}{{ data_list[0]['sender_phone']|default('', true) }}{% else %}{% endif %}
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -145,9 +149,15 @@
               <label class="list-group-item list-group-item-action d-flex gap-3 align-items-start" style="cursor:pointer">
                 <input class="form-check-input mt-1" type="radio" name="data_choice" value="{{ loop.index0 }}" />
                 <div>
-                  <div class="fw-semibold">{{ item['recipient_name'] }} ‧ {{ item['recipient_phone'] }}</div>
-                  <div class="small text-body-secondary">{{ item['recipient_address'] }}</div>
-                  <div class="small">送禮人：{{ item['sender_name'] or '—' }} {{ item['sender_phone'] or '' }}</div>
+                  <div class="fw-semibold">
+                    {{ item['recipient_name']|default('', true) }} ‧ {{ item['recipient_phone']|default('', true) }}
+                  </div>
+                  <div class="small text-body-secondary">
+                    {{ item['recipient_address']|default('', true) }}
+                  </div>
+                  <div class="small">
+                    送禮人：{{ item['sender_name']|default('', true) }} {{ item['sender_phone']|default('', true) }}
+                  </div>
                 </div>
               </label>
               {% endfor %}
@@ -342,11 +352,11 @@
             const idx = parseInt(selected.value, 10);
             const d = dataList[idx];
             if(!d) return;
-            document.getElementById('recipient_name').textContent = d.recipient_name || '—';
-            document.getElementById('recipient_phone').textContent = d.recipient_phone || '—';
-            document.getElementById('recipient_address').textContent = d.recipient_address || '—';
-            document.getElementById('sender_name').textContent = d.sender_name || '—';
-            document.getElementById('sender_phone').textContent = d.sender_phone || '—';
+            document.getElementById('recipient_name').textContent = d.recipient_name || '';
+            document.getElementById('recipient_phone').textContent = d.recipient_phone || '';
+            document.getElementById('recipient_address').textContent = d.recipient_address || '';
+            document.getElementById('sender_name').textContent = d.sender_name || '';
+            document.getElementById('sender_phone').textContent = d.sender_phone || '';
           });
         }
 
